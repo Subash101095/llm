@@ -46,6 +46,7 @@ def summarize_text(text: str) -> Optional[str]:
               f"Keep the summary under 200 words."
               f"Do not give false information.  "
               f"Generate in bullet points.  ")
+
     payload = {
         "model": OLLAMA_MODEL,
         "prompt": prompt,
@@ -89,7 +90,6 @@ def summarize():
 
     # Return the summary as a JSON response
     return jsonify({"summary": summary}), 200
-
 
 
 if __name__ == '__main__':

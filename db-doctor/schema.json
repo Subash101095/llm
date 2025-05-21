@@ -1,0 +1,22 @@
+{
+  "tables": [
+    {
+      "name": "Customers",
+      "columns": [
+        {"name": "CustomerID", "type": "INT", "primary_key": true},
+        {"name": "FirstName", "type": "VARCHAR(50)"},
+        {"name": "LastName", "type": "VARCHAR(50)"},
+        {"name": "Email", "type": "VARCHAR(100)"}
+      ]
+    },
+    {
+      "name": "Orders",
+      "columns": [
+        {"name": "OrderID", "type": "INT", "primary_key": true},
+        {"name": "CustomerID", "type": "INT", "foreign_key": "Customers(CustomerID)"},
+        {"name": "OrderDate", "type": "DATE"},
+        {"name": "TotalAmount", "type": "DECIMAL(10,2)"}
+      ]
+    }
+  ]
+}
