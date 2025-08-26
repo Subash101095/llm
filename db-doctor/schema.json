@@ -17,6 +17,32 @@
         {"name": "OrderDate", "type": "DATE"},
         {"name": "TotalAmount", "type": "DECIMAL(10,2)"}
       ]
+    },
+    {
+      "name": "Products",
+      "columns": [
+        {"name": "ProductID", "type": "INT", "primary_key": true},
+        {"name": "ProductName", "type": "VARCHAR(100)"},
+        {"name": "Price", "type": "DECIMAL(10,2)"}
+      ]
+    },
+    {
+      "name": "OrderItems",
+      "columns": [
+        {"name": "OrderItemID", "type": "INT", "primary_key": true},
+        {"name": "OrderID", "type": "INT", "foreign_key": "Orders(OrderID)"},
+        {"name": "ProductID", "type": "INT", "foreign_key": "Products(ProductID)"},
+        {"name": "Quantity", "type": "INT"}
+      ]
+    },
+    {
+      "name": "Users",
+      "columns": [
+        {"name": "UserID", "type": "INT", "primary_key": true},
+        {"name": "FirstName", "type": "VARCHAR(50)"},
+        {"name": "LastName", "type": "VARCHAR(50)"},
+        {"name": "Email", "type": "VARCHAR(100)"}
+      ]
     }
   ]
 }
