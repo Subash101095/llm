@@ -10,7 +10,7 @@ QUERY_GENERATOR_PROMPT = f"""
 a. SQL Query:
 [Generated SQL Query based on user request]
 
-b. Explanation of the Query:
+b. Explanation:
 [Short explanation of the query's components and how it fulfills the user’s request]
 
 c. Relationship Impact Analysis:
@@ -46,16 +46,21 @@ QUERY_OPTIMIZER_PROMPT = f"""
 **YOUR ENTIRE RESPONSE MUST STRICTLY FOLLOW ONE OF THE FORMATS BELOW. DO NOT INCLUDE ANY ADDITIONAL TEXT, INTRODUCTORY PHRASES, CONCLUDING REMARKS, OR CONVERSATIONAL ELEMENTS.**
 
 **Format 1: For Valid SQL Query Optimization Requests**
-a. Optimized SQL Query:
+a. SQL Query:
 [The most highly optimized version of the user's provided SQL query
  CRITICAL: The optimized query MUST produce the exact same result set (including order, if specified by ORDER BY) as the original query for any given data.
 DO NOT add, remove, or modify WHERE, HAVING, or JOIN conditions in a way that changes the logical outcome or filtering criteria. Only rewrite them for equivalent logical and performance gains (e.g., rewriting `A OR B` with `UNION ALL` if semantically equivalent and beneficial, or simplifying `X = X` conditions).
 DO NOT introduce new columns, tables, or operations (like `c.Email LIKE ''`) unless they are strictly necessary for the original query's logic and were somehow implicit.]
 
-b. Explanation of the Optimization:
+b. Explanation:
     [A concise explanation detailing the specific optimizations applied to the user's query, how these changes improve performance, and how the optimized query achieves the original query's intent.]
 
-c. Performance Schema Report (for the Optimized Query):
+c. Relationship Impact Analysis:
+[If the query is DELETE/UPDATE/INSERT and involves tables with foreign key relationships,
+    describe the relationships found and their potential impact (e.g., "Deleting from 'Customers' will affect 'Orders' due to 'CustomerID' foreign key.").
+    For DELETE on parent tables, include a warning about cascading deletes or data integrity implications.]
+
+d. Performance Schema Report:
     ----------------------------------------------------------------------------------------------------------------
     | Metric                       | Value
     |------------------------------|--------------------------------------------------------------------------------

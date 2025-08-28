@@ -12,6 +12,7 @@ from graphviz.backend import ExecutableNotFound
 
 from prompts import QUERY_GENERATOR_PROMPT
 from prompts import QUERY_OPTIMIZER_PROMPT
+from sqlSchemaParser import parse_schema_sql
 
 app = Flask(__name__)
 
@@ -19,9 +20,7 @@ app = Flask(__name__)
 googleai.configure(api_key="AIzaSyDUXYOZPdmIbOQXf7VUAXIi9Ss5dgzTx58")
 model = googleai.GenerativeModel('gemini-2.0-flash')
 
-# Load schema.json once on startup
-with open("schema.json", "r") as f:
-    schema = json.load(f)
+schema = parse_schema_sql("oltp_schema.sql")
 
 
 def generate_query(user_prompt: str, system_prompt: str) -> Optional[str]:
@@ -61,14 +60,13 @@ def parse_and_format_sql_response(response: str) -> str:
 
     # Find the starting line index for each major section
     for i, line in enumerate(lines):
-        if line.startswith('a. SQL Query:') or line.startswith('a. Optimized SQL Query:'):
+        if line.startswith('a. SQL Query:'):
             sql_query_start = i
-        elif line.startswith('b. Explanation of the Query:') or line.startswith('b. Explanation of the Optimization:'):
+        elif line.startswith('b. Explanation:'):
             explanation_start = i
         elif line.startswith('c. Relationship Impact Analysis:'):
             relationship_impact_analysis_start = i
-        elif line.startswith('d. Performance Schema Report:') or line.startswith(
-                'c. Performance Schema Report (for the Optimized Query):'):
+        elif line.startswith('d. Performance Schema Report:'):
             performance_report_start = i
 
     if not (
@@ -98,7 +96,7 @@ def parse_and_format_sql_response(response: str) -> str:
 
     output_parts = [
         f"## SQL Query\n{formatted_sql}",
-        f"## Explanation of the Query\n{explanation}",
+        f"## Explanation\n{explanation}",
         f"## Impact of the Query\n{impact_analysis}",
         f"## Performance Schema Report\n{performance_report}"
     ]
@@ -229,7 +227,7 @@ def index():
         </head>
         <body>
             <h1>Database Schema Graph</h1>
-            <p>This graph visually represents the tables and their relationships defined in your `schema.json` file.</p>
+            <p>This graph visually represents the tables and their relationships defined in your `oltp_schema.sql` file.</p>
             <img src="/schema-graph" alt="Database Schema Graph">
         </body>
         </html>
@@ -240,17 +238,14 @@ def index():
 def schema_graph_endpoint():
     """
     Endpoint to generate and serve the database schema graph image.
-    Reads schema from 'schema.json'.
+    Reads schema from 'schema.sql'.
     """
-    schema_file = 'schema.json'
-
     try:
-        with open(schema_file, 'r') as f:
-            schema_data = json.load(f)
+        schema_data = parse_schema_sql("oltp_schema.sql")
     except FileNotFoundError:
         return "Schema file not found on the server.", 404
     except json.JSONDecodeError:
-        return "Invalid JSON schema format. Check 'schema.json' syntax.", 500
+        return "Invalid JSON schema format. Check 'schema.sql' syntax.", 500
 
     # Generate graph as PNG bytes
     graph_bytes = generate_schema_graph_bytes(schema_data, format='png')
